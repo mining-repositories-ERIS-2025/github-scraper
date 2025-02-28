@@ -1,15 +1,16 @@
 {
-"repository": "https://github.com/AUTOMATIC1111/stable-diffusion-webui", 
-"repository_stars": 148019, 
-"hashId": "f97e3548e54cfc914c195d6d4d48792e4d021261", 
-"msg": "Merge pull request #15006 from imnodb/master\n\nfix: the `split_threshold` parameter does not work when running Split oversized images", 
-"author": "AUTOMATIC1111",  
-"author_timestamp": 1708921002.0, 
-"author_timezone": -10800, 
-"lines": 2, 
-"modified_file": {
-  "filename": "postprocessing_split_oversized.py", 
-  "cyclomatic_complexity": 14,
-  "added_lines": [[64, "        if ratio >= 1.0 or ratio > split_threshold:"]], 
-  "deleted_lines": [[64, "        if ratio >= 1.0 and ratio > split_threshold:"]]
-}}
+  "repository": "https://github.com/AUTOMATIC1111/stable-diffusion-webui", 
+  "repository_stars": 148019, 
+  "hashId": "f97e3548e54cfc914c195d6d4d48792e4d021261", 
+  "msg": "Merge pull request #15006 from imnodb/master\n\nfix: the `split_threshold` parameter does not work when running Split oversized images", 
+  "author": "AUTOMATIC1111",  
+  "author_timestamp": 1708921002.0, 
+  "author_timezone": -10800, 
+  "lines": 2, 
+  "modified_file": {
+    "filename": "postprocessing_split_oversized.py", 
+    "cyclomatic_complexity": 14,
+    "added_lines": [[64, "        if ratio >= 1.0 or ratio > split_threshold:"]], 
+    "deleted_lines": [[64, "        if ratio >= 1.0 and ratio > split_threshold:"]]
+  }
+}
