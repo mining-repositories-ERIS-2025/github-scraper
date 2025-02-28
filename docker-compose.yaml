@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  github-scraper:
+    build: .
+    container_name: github-scraper
+    volumes:
+      - .:/app
+      - ./src/data_stages:/app/data_stages
+    working_dir: /app
+    command: python src/main.py
+    environment:
+      - PYTHONUNBUFFERED=1
