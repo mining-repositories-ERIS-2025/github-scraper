@@ -73,7 +73,6 @@ class GitHubCommit:
     hash_id: str
     msg: str
     author: str
-    author_date: str
     author_timestamp: float
     author_timezone: int
     lines: int
@@ -113,7 +112,6 @@ class GitHubCommit:
         result["hashId"] = from_str(self.hash_id)
         result["msg"] = from_str(self.msg)
         result["author"] = from_str(self.author)
-        result["author_date"] = from_str(self.author_date)
         result["author_timestamp"] = from_int(self.author_timestamp)
         result["author_timezone"] = from_int(self.author_timezone)
         result["lines"] = from_int(self.lines)
