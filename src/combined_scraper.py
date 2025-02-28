@@ -70,29 +70,28 @@ class GitScraper:
                 try:
                     modified_file = None
 
-                    if any(keyword in commit.msg.lower() for keyword in KEYWORDS):
-                        if commit.lines < 10:
-                            if sum(1 for file in commit.modified_files if file.filename.endswith('.py')) == 1:
-                                file = next(file for file in commit.modified_files if file.filename.endswith('.py'))
+                    if commit.lines < 10: # This is a suitable filter for initial raw data collection
+                        if sum(1 for file in commit.modified_files if file.filename.endswith('.py')) == 1:
+                            file = next(file for file in commit.modified_files if file.filename.endswith('.py'))
 
-                                modified_file = ModifiedFile(
-                                    filename=file.filename,
-                                    cyclomatic_complexity=file.complexity,
-                                    added_lines=file.diff_parsed["added"],
-                                    deleted_lines=file.diff_parsed["deleted"]
-                                )
+                            modified_file = ModifiedFile(
+                                filename=file.filename,
+                                cyclomatic_complexity=file.complexity,
+                                added_lines=file.diff_parsed["added"],
+                                deleted_lines=file.diff_parsed["deleted"]
+                            )
 
-                                print("\n")
-                                print(bcolors.OKCYAN + "____COMMIT____")
-                                print(bcolors.OKBLUE + file.filename)
-                                print(bcolors.OKCYAN + "|‾‾‾‾‾‾‾‾‾‾‾‾‾")
-                                print(bcolors.OKCYAN + "|> Added")
-                                for added in file.diff_parsed["added"]:
-                                    print(bcolors.OKGREEN + "| ln {0:<4}: {1}".format(added[0], added[1]))
-                                print(bcolors.OKCYAN + "|> Removed")
-                                for deleted in file.diff_parsed["deleted"]:
-                                    print(bcolors.FAIL + "| ln {0:<4}: {1}".format(deleted[0], deleted[1]))
-                                print(bcolors.OKCYAN + "|_____________" + bcolors.ENDC)
+                            print("\n")
+                            print(bcolors.OKCYAN + "____COMMIT____")
+                            print(bcolors.OKBLUE + file.filename)
+                            print(bcolors.OKCYAN + "|‾‾‾‾‾‾‾‾‾‾‾‾‾")
+                            print(bcolors.OKCYAN + "|> Added")
+                            for added in file.diff_parsed["added"]:
+                                print(bcolors.OKGREEN + "| ln {0:<4}: {1}".format(added[0], added[1]))
+                            print(bcolors.OKCYAN + "|> Removed")
+                            for deleted in file.diff_parsed["deleted"]:
+                                print(bcolors.FAIL + "| ln {0:<4}: {1}".format(deleted[0], deleted[1]))
+                            print(bcolors.OKCYAN + "|_____________" + bcolors.ENDC)
 
                     commit_object = GitHubCommit(
                         repository=repo[0], 
