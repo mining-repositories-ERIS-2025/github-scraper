@@ -5,21 +5,17 @@ T = TypeVar("T")
 
 
 def from_str(x: Any) -> str:
-    assert isinstance(x, str)
     return x
 
 
 def from_int(x: Any) -> int:
-    assert isinstance(x, int) and not isinstance(x, bool)
     return x
 
 def from_float(x: Any) -> float:
-    assert isinstance(x, float)
     return x
 
 
 def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
-    assert isinstance(x, list)
     return [f(y) for y in x]
 
 
@@ -53,7 +49,7 @@ class ModifiedFile:
     def from_dict(obj: Any) -> 'ModifiedFile':
         assert isinstance(obj, dict)
         filename = from_str(obj.get("filename"))
-        cyclomatic_complexity = from_int(obj.get("cyclomatic_complexity"))
+        cyclomatic_complexity = from_int(obj.get("cyclomatic_complexity")) | -1
         added_lines = from_list(lambda x: from_list(lambda x: from_union([from_int, from_str], x), x), obj.get("added_lines"))
         deleted_lines = from_list(lambda x: from_list(lambda x: from_union([from_int, from_str], x), x), obj.get("deleted_lines"))
         return ModifiedFile(filename, cyclomatic_complexity, added_lines, deleted_lines)
@@ -92,18 +88,17 @@ class GitHubCommit:
 
     @staticmethod
     def from_dict(obj: Any) -> 'GitHubCommit':
-        assert isinstance(obj, dict)
+        #assert isinstance(obj, dict)
         repository = from_str(obj.get("repository"))
         repository_stars = from_int(obj.get("repository_stars"))
         hash_id = from_str(obj.get("hashId"))
         msg = from_str(obj.get("msg"))
         author = from_str(obj.get("author"))
-        author_date = from_str(obj.get("author_date"))
         author_timestamp = from_float(obj.get("author_timestamp"))
         author_timezone = from_int(obj.get("author_timezone"))
         lines = from_int(obj.get("lines"))
         modified_file = ModifiedFile.from_dict(obj.get("modified_file"))
-        return GitHubCommit(repository, repository_stars, hash_id, msg, author, author_date, author_timestamp, author_timezone, lines, modified_file)
+        return GitHubCommit(repository, repository_stars, hash_id, msg, author, author_timestamp, author_timezone, lines, modified_file)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -112,10 +107,10 @@ class GitHubCommit:
         result["hashId"] = from_str(self.hash_id)
         result["msg"] = from_str(self.msg)
         result["author"] = from_str(self.author)
-        result["author_timestamp"] = from_int(self.author_timestamp)
+        result["author_timestamp"] = from_float(self.author_timestamp)  # Changed from from_int to from_float
         result["author_timezone"] = from_int(self.author_timezone)
         result["lines"] = from_int(self.lines)
-        result["modified_file"] = to_class(ModifiedFile, self.modified_file)
+        result["modified_file"] = to_class(ModifiedFile, self.modified_file) if self.modified_file is not None else None
         return result
 
 

@@ -4,24 +4,13 @@ from pydriller import Repository
 from tqdm import tqdm
 import json
 from datetime import datetime, timedelta
+from models.bcolor import bcolors
 from models.commit_parser import GitHubCommit, ModifiedFile
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 KEYWORDS = ["fix", "bug", "error"]
 
 class GitScraper:
     def gitstar_ranking_generator(this,pages: int):
-        """Generator function to fetch repositories from GitStar ranking pages."""
         for page in range(1, pages + 1):
             url = f"https://gitstar-ranking.com/repositories?page={page}"
             response = requests.get(url)
@@ -53,7 +42,7 @@ class GitScraper:
         commit_count = 0
         commit_limit = 10000
 
-        for repo in this.gitstar_ranking_generator(100):
+        for repo in this.gitstar_ranking_generator(500):
             repository_rank += 1
 
             if repo[1] != "Python":
@@ -80,18 +69,6 @@ class GitScraper:
                                 added_lines=file.diff_parsed["added"],
                                 deleted_lines=file.diff_parsed["deleted"]
                             )
-
-                            #print("\n")
-                            #print(bcolors.OKCYAN + "____COMMIT____")
-                            #print(bcolors.OKBLUE + file.filename)
-                            #print(bcolors.OKCYAN + "|‾‾‾‾‾‾‾‾‾‾‾‾‾")
-                            #print(bcolors.OKCYAN + "|> Added")
-                            #for added in file.diff_parsed["added"]:
-                            #    print(bcolors.OKGREEN + "| ln {0:<4}: {1}".format(added[0], added[1]))
-                            #print(bcolors.OKCYAN + "|> Removed")
-                            #for deleted in file.diff_parsed["deleted"]:
-                            #    print(bcolors.FAIL + "| ln {0:<4}: {1}".format(deleted[0], deleted[1]))
-                            #print(bcolors.OKCYAN + "|_____________" + bcolors.ENDC)
 
                     commit_object = GitHubCommit(
                         repository=repo[0], 
