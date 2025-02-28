@@ -56,9 +56,6 @@ class GitScraper:
         for repo in this.gitstar_ranking_generator(1):
             repository_rank += 1
 
-            if repository_rank > 20:
-                exit(0)
-
             if repo[1] != "Python":
                 print(bcolors.WARNING + f"{repository_rank}> Repository {repo[0]} is not Python skipping" + bcolors.ENDC)
                 continue
@@ -71,12 +68,11 @@ class GitScraper:
                 commit_count += 1
 
                 try:
-                    
                     modified_file = None
 
                     if any(keyword in commit.msg.lower() for keyword in KEYWORDS):
                         if commit.lines < 10:
-                            if any(file.filename.endswith('.py') for file in commit.modified_files):
+                            if sum(1 for file in commit.modified_files if file.filename.endswith('.py')) == 1:
                                 file = next(file for file in commit.modified_files if file.filename.endswith('.py'))
 
                                 modified_file = ModifiedFile(
