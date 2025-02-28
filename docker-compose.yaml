@@ -5,7 +5,6 @@ services:
     build: .
     container_name: github-scraper
     volumes:
-      - .:/app
       - ./src/data_stages:/app/data_stages
     working_dir: /app
     command: python src/main.py
