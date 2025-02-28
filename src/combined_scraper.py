@@ -49,11 +49,11 @@ class GitScraper:
 
     def git_scrape(this):
         repository_rank = 0
-        one_year_ago = datetime.now() - timedelta(days=365)
+        one_year_ago = datetime.now() - timedelta(days=365*5)
         commit_count = 0
         commit_limit = 10000
 
-        for repo in this.gitstar_ranking_generator(1):
+        for repo in this.gitstar_ranking_generator(100):
             repository_rank += 1
 
             if repo[1] != "Python":
@@ -81,17 +81,17 @@ class GitScraper:
                                 deleted_lines=file.diff_parsed["deleted"]
                             )
 
-                            print("\n")
-                            print(bcolors.OKCYAN + "____COMMIT____")
-                            print(bcolors.OKBLUE + file.filename)
-                            print(bcolors.OKCYAN + "|‾‾‾‾‾‾‾‾‾‾‾‾‾")
-                            print(bcolors.OKCYAN + "|> Added")
-                            for added in file.diff_parsed["added"]:
-                                print(bcolors.OKGREEN + "| ln {0:<4}: {1}".format(added[0], added[1]))
-                            print(bcolors.OKCYAN + "|> Removed")
-                            for deleted in file.diff_parsed["deleted"]:
-                                print(bcolors.FAIL + "| ln {0:<4}: {1}".format(deleted[0], deleted[1]))
-                            print(bcolors.OKCYAN + "|_____________" + bcolors.ENDC)
+                            #print("\n")
+                            #print(bcolors.OKCYAN + "____COMMIT____")
+                            #print(bcolors.OKBLUE + file.filename)
+                            #print(bcolors.OKCYAN + "|‾‾‾‾‾‾‾‾‾‾‾‾‾")
+                            #print(bcolors.OKCYAN + "|> Added")
+                            #for added in file.diff_parsed["added"]:
+                            #    print(bcolors.OKGREEN + "| ln {0:<4}: {1}".format(added[0], added[1]))
+                            #print(bcolors.OKCYAN + "|> Removed")
+                            #for deleted in file.diff_parsed["deleted"]:
+                            #    print(bcolors.FAIL + "| ln {0:<4}: {1}".format(deleted[0], deleted[1]))
+                            #print(bcolors.OKCYAN + "|_____________" + bcolors.ENDC)
 
                     commit_object = GitHubCommit(
                         repository=repo[0], 
@@ -106,7 +106,7 @@ class GitScraper:
                         modified_file=modified_file
                     )
                     
-                    print(commit_object)
+                    yield commit_object
 
                 except Exception as e:
                     print(bcolors.FAIL + f"Error processing commit {commit.hash}: {e}")
