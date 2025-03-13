@@ -1,5 +1,6 @@
 import math
 from cleaner import Cleaner
+from patcher import Patcher
 from combined_scraper import GitScraper
 from models.bcolor import bcolors
 from models.commit_parser import git_hub_commit_to_dict
@@ -11,6 +12,7 @@ def main():
     print(bcolors.OKBLUE + "Select an option:" + bcolors.ENDC)
     print(bcolors.OKCYAN + "1. Run scraping" + bcolors.ENDC)
     print(bcolors.OKCYAN + "2. Run cleaning" + bcolors.ENDC)
+    print(bcolors.OKCYAN + "3. Run patching" + bcolors.ENDC)
     choice = input(bcolors.OKBLUE + "Enter the number of the function to run: " + bcolors.ENDC)
 
     if choice == '1':
@@ -19,6 +21,9 @@ def main():
     elif choice == '2':
         print(bcolors.OKBLUE + "Running cleaning..." + bcolors.ENDC)
         cleaned_2()
+    elif choice == '3':
+        print(bcolors.OKBLUE + "Running patching..." + bcolors.ENDC)
+        patched_3()
     else:
         print(bcolors.FAIL + "Invalid choice" + bcolors.ENDC)
 
@@ -50,6 +55,20 @@ def cleaned_2():
         clean_index += 1
         file_index = math.ceil(clean_index / 10000)
         filewriter.writeJsonFile(f'./data_stages/2_cleaned/commits_cleaned_{file_index:04}.jsonl', cleaned_file)
+
+def patched_3():
+    filewriter = FileWriter()
+    filereader = FileReader()
+
+    patch_index = 0
+    for file in filereader.readJsonLines('./data_stages/2_cleaned'):
+        patched_file = Patcher().patch_file(file)
+        if patched_file == {}:
+            continue
+
+        patch_index += 1
+        file_index = math.ceil(patch_index / 10000)
+        filewriter.writeJsonFile(f'./data_stages/3_patched/commits_patched_{file_index:04}.jsonl', patched_file)
 
 if __name__ == '__main__':
     main()
