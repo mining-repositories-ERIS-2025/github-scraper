@@ -45,6 +45,6 @@ class Patcher:
 
         except (tokenize.TokenError, SyntaxError, LookupError, UnicodeError) as e: 
             print(bcolors.FAIL + f"Failed to tokenize line: {code}" + bcolors.ENDC)
-            print(bcolors.FAIL + e + bcolors.ENDC)
+            print(bcolors.FAIL + str(e) + bcolors.ENDC)
 
         return tokens

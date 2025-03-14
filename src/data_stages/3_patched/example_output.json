@@ -1,0 +1,71 @@
+{
+    "repository": "https://github.com/TheAlgorithms/Python",
+    "hashId": "cb5f8c6e4e77fdfefb1c7c9c7507e36fa058def9",
+    "msg": "Fix typo (#1797)\n\ncolision => collision",
+    "modified_file": {
+        "added_lines": [
+            [
+                47,
+                "    def _collision_resolution(self, key, data=None):"
+            ],
+            [
+                77,
+                "            collision_resolution = self._collision_resolution(key, data)"
+            ],
+            [
+                78,
+                "            if collision_resolution is not None:"
+            ],
+            [
+                79,
+                "                self._set_value(collision_resolution, data)"
+            ]
+        ],
+        "deleted_lines": [
+            [
+                47,
+                "    def _colision_resolution(self, key, data=None):"
+            ],
+            [
+                77,
+                "            colision_resolution = self._colision_resolution(key, data)"
+            ],
+            [
+                78,
+                "            if colision_resolution is not None:"
+            ],
+            [
+                79,
+                "                self._set_value(colision_resolution, data)"
+            ]
+        ]
+    },
+    "token_changes": {
+        "added_tokens": {
+            "self": 3,
+            "data": 3,
+            "collision_resolution": 3,
+            "_collision_resolution": 2,
+            "key": 2,
+            "None": 2,
+            "def": 1,
+            "if": 1,
+            "is": 1,
+            "not": 1,
+            "_set_value": 1
+        },
+        "deleted_tokens": {
+            "self": 3,
+            "data": 3,
+            "colision_resolution": 3,
+            "_colision_resolution": 2,
+            "key": 2,
+            "None": 2,
+            "def": 1,
+            "if": 1,
+            "is": 1,
+            "not": 1,
+            "_set_value": 1
+        }
+    }
+}
