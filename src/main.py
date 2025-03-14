@@ -84,8 +84,6 @@ def categorized_4():
                   'race conditions': [' race ',' mutex ',' semaphore ',' atomic ', " deadlock "], 
                   'memory leaks': [' memory', 'leak', ' free ', ' gc ', ' garbage']
                   }
-    
-    count = 10
 
     categorized_messages = {key: [] for key in categories.keys()}
     for file in filereader.readJsonLines('./data_stages/3_patched'):
@@ -101,14 +99,7 @@ def categorized_4():
                     file['keyword_used'] = keyword
                     categorized_messages[category].append(file)
                     filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
-
-                    count -= 1
-                    break
-        
-        #if count == 0:
-        #    break    
     
     
-
 if __name__ == '__main__':
     main()
