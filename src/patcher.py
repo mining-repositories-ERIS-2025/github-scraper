@@ -43,7 +43,8 @@ class Patcher:
                 if token.type == tokenize.NAME:
                     tokens.append(token.string)
 
-        except (tokenize.TokenError, SyntaxError, LookupError):
-            pass  
+        except (tokenize.TokenError, SyntaxError, LookupError, UnicodeError) as e: 
+            print(bcolors.FAIL + f"Failed to tokenize line: {code}" + bcolors.ENDC)
+            print(bcolors.FAIL + e + bcolors.ENDC)
 
         return tokens
