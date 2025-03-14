@@ -13,6 +13,7 @@ def main():
     print(bcolors.OKCYAN + "1. Run scraping" + bcolors.ENDC)
     print(bcolors.OKCYAN + "2. Run cleaning" + bcolors.ENDC)
     print(bcolors.OKCYAN + "3. Run patching" + bcolors.ENDC)
+    print(bcolors.OKCYAN + "4. Run catagorizing" + bcolors.ENDC)
     choice = input(bcolors.OKBLUE + "Enter the number of the function to run: " + bcolors.ENDC)
 
     if choice == '1':
@@ -24,6 +25,9 @@ def main():
     elif choice == '3':
         print(bcolors.OKBLUE + "Running patching..." + bcolors.ENDC)
         patched_3()
+    elif choice == '4':
+        print(bcolors.OKBLUE + "Running categorizing..." + bcolors.ENDC)
+        categorized_4()
     else:
         print(bcolors.FAIL + "Invalid choice" + bcolors.ENDC)
 
@@ -69,6 +73,42 @@ def patched_3():
         patch_index += 1
         file_index = math.ceil(patch_index / 10000)
         filewriter.writeJsonFile(f'./data_stages/3_patched/commits_patched_{file_index:04}.jsonl', patched_file)
+
+def categorized_4():
+    filewriter = FileWriter()
+    filereader = FileReader()
+
+    categories = {
+                  'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', 'npe'], 
+                  'overflows': [' overflow '],
+                  'race conditions': [' race ',' mutex ',' semaphore ',' atomic ', " deadlock "], 
+                  'memory leaks': [' memory', 'leak', ' free ', ' gc ', ' garbage']
+                  }
+    
+    count = 10
+
+    categorized_messages = {key: [] for key in categories.keys()}
+    for file in filereader.readJsonLines('./data_stages/3_patched'):
+        # get commit message
+        commit_message = file.get('msg').lower()
+
+
+        # map to category
+        for category, keywords in categories.items():
+            for keyword in keywords:
+                if keyword in commit_message:
+                    file['category'] = category
+                    file['keyword_used'] = keyword
+                    categorized_messages[category].append(file)
+                    filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
+
+                    count -= 1
+                    break
+        
+        #if count == 0:
+        #    break    
+    
+    
 
 if __name__ == '__main__':
     main()
