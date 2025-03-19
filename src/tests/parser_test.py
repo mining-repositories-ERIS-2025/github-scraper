@@ -1,6 +1,6 @@
 import os
 import pytest
-from utils.commit_parser import git_hub_commit_from_dict
+from models.commit_parser import git_hub_commit_from_dict
 import json
 
 @pytest.fixture

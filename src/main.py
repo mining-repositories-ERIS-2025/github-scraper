@@ -79,10 +79,11 @@ def categorized_4():
     filereader = FileReader()
 
     categories = {
-                  'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', 'npe'], 
+                  'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', ' npe'], 
                   'overflows': [' overflow '],
-                  'race conditions': [' race ',' mutex ',' semaphore ',' atomic ', " deadlock "], 
-                  'memory leaks': [' memory', 'leak', ' free ', ' gc ', ' garbage']
+                  'race conditions': [
+                     ' race ', 'mutex '," deadlock "], 
+                  'memory leaks': ['memory leak', 'memory-leak']
                   }
 
     categorized_messages = {key: [] for key in categories.keys()}
