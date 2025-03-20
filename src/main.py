@@ -81,8 +81,7 @@ def categorized_4():
     categories = {
                   'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', ' npe'], 
                   'overflows': [' overflow '],
-                  'race conditions': [
-                     ' race ', 'mutex '," deadlock "], 
+                  'race conditions': [' race ', 'mutex '," deadlock "], 
                   'memory leaks': ['memory leak', 'memory-leak']
                   }
 
