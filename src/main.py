@@ -1,5 +1,6 @@
 import math
 from cleaner import Cleaner
+from models.graph import Graph
 from patcher import Patcher
 from combined_scraper import GitScraper
 from models.bcolor import bcolors
@@ -81,6 +82,8 @@ def patched_3():
 def categorized_bug_4():
     filewriter = FileWriter()
     filereader = FileReader()
+    plot = Graph()
+    frequency_dict = {}
 
     categories = {
                   'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', ' npe'], 
@@ -101,62 +104,132 @@ def categorized_bug_4():
                 if keyword in commit_message:
                     file['category'] = category
                     file['keyword_used'] = keyword
+
+                    plot.add_to_frequency_dict(category)
+
                     categorized_messages[category].append(file)
                     filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
     
+    plot.plot_histogram(title='Bug Category Frequency')
+
 def categorized_type_5():
     filewriter = FileWriter()
     filereader = FileReader()
+    plot = Graph()
   
     for file in filereader.readJsonLines('./data_stages/4_categorized'):
 
-        diffs = file['token_changes']['token_diff']
         category = file['category']
 
-        change = helper_constrain_or_loosen(diffs)
+        change = helper_boolean(file['token_changes'])
+        plot.add_to_frequency_dict(change)
+
         if change != None:
             file['patch_type'] = change
             filewriter.writeJsonFile(f'./data_stages/5_categorized_patch/commits_{category}.jsonl', file)
             continue
-        change = helper_nullcheck(diffs)
-        if change != None:
-            file['patch_type'] = change
-            filewriter.writeJsonFile(f'./data_stages/5_categorized_patch/commits_{category}.jsonl', file)
+        else:
+            file['patch_type'] = "unknown"
+            filewriter.writeJsonFile(f'./data_stages/5_categorized_patch/commits_unknown.jsonl', file)
             continue
+    plot.plot_histogram(title='Patch Type Frequency')
 
 
+def helper_boolean(token_changes: list[str]):
 
-def helper_try_except(diffs: list[str]):
-    if diffs.get("try") > 0 and diffs.get("except") > 0:
-        if diffs.get("OverflowError") > 0:
-            return "try-except OverflowError"
-        return "try-except"
-    return None
+    diffs = token_changes['token_diff']
+    adds = token_changes['added_tokens']
+    dels = token_changes['deleted_tokens']
 
-def helper_collison(diffs: list[str]):
-    if diffs.get("hash") > 0 or diffs.get("random") > 0:
-        return "collision avoidance"
-    return None
+    ## boolean change
+    if diffs.get("true",0) > 0 and diffs.get("false",0) > 0:
+        return "boolean change"
 
-def helper_checkclosure(diffs: list[str]):
+    ## closure check
     if diffs.get("if",0) > 0 and diffs.get("done",0) > 0:
         return "check closure"
-    return None
 
-def helper_nullcheck(diffs: list[str]):
+    ## null check
     if diffs.get("None",0) > 0 and diffs.get("is",0) > 0:
         return "null check"
-    return None
 
-def helper_constrain_or_loosen(diffs: list[str]):
+    ## collision avoidance using hash or random
+    if diffs.get("hash",0) > 0 or diffs.get("random",0) > 0:
+        return "collision avoidance"
+
+    if diffs.get("dtype",0) > 0 or diffs.get("astype",0) > 0:
+        return "explicit typing"
+
+    ## try except
+    if diffs.get("try",0) > 0 or diffs.get("except",0) > 0:
+        #if diffs.get("OverflowError",0) > 0:
+            #return "try-except OverflowError"
+        return "try-except"
+
+    ## scoping change
+    if diffs.get("import",0) > 0:
+        return "libary change"
+
+    ## thread cancelling
+    if diffs.get("cancel",0) > 0:
+        return "thread cancelling"
+
+    ## condition logic
     if diffs.get("and",0) > 0:
-        return "Conditional tighten"
+        return "conditional tighten"
     if diffs.get("and",0) < 0:
-        return "Conditional loosening"
+        return "conditional loosen"
     if diffs.get("or",0) > 0:
-        return "Conditional loosen"
+        return "conditional loosen"
     if diffs.get("or",0) < 0:
-        return "Conditional tighten"    
+        return "conditional tighten"  
+    if diffs.get("not",0) != 0:
+        return "conditional negate"
+
+    ## ensuring cleanup
+    if diffs.get("finally",0) > 0:
+        return "ensure cleanup"
+
+    ## check if values are being populated, ie var = None -> var = "value"
+    if diffs.get("None",0) < 0:
+        return "value population"
+
+    ## conditional change
+    if diffs.get("if",0) != 0:
+        return "conditional change"
+
+    ## function creation
+    if diffs.get("def",0) > 0:
+        return "function creation"
+
+    ## code deletion
+    if diffs.get("del",0) != 0:
+        return "object deletion"
+
+    ## filter changes
+    if diffs.get("filter",0) != 0:
+        return "filter change"
+
+    ## SQL based fix
+    if diffs.get("sqlalchemy",0) != 0 or diffs.get("sqlite3",0) != 0 or diffs.get("psycopg2",0) != 0 or diffs.get("pymysql",0) != 0:
+        return "sql fix"
+    
+    ## numpy based fix
+    if diffs.get("numpy",0) != 0 or diffs.get("np",0) != 0 or diffs.get("ndarray",0) != 0:
+        return "numpy fix"
+
+    ## regex based fix
+    if diffs.get("re",0) != 0 or diffs.get("regex",0) != 0 or diffs.get("match",0) != 0:
+        return "regex fix"
+
+    ## if the fix was solved be only deleting code
+    if len(adds) == 0 and len(dels) != 0:
+        return "code deletion"
+
+    ## if the change was made but was not registered by the parser
+    if len(diffs) == 0:
+        return "no syntax change"
+
     return None
 
 
