@@ -13,7 +13,8 @@ def main():
     print(bcolors.OKCYAN + "1. Run scraping" + bcolors.ENDC)
     print(bcolors.OKCYAN + "2. Run cleaning" + bcolors.ENDC)
     print(bcolors.OKCYAN + "3. Run patching" + bcolors.ENDC)
-    print(bcolors.OKCYAN + "4. Run catagorizing" + bcolors.ENDC)
+    print(bcolors.OKCYAN + "4. Run catagorizing bug type" + bcolors.ENDC)
+    print(bcolors.OKCYAN + "5. Run catagorizing patch type" + bcolors.ENDC)
     choice = input(bcolors.OKBLUE + "Enter the number of the function to run: " + bcolors.ENDC)
 
     if choice == '1':
@@ -27,7 +28,10 @@ def main():
         patched_3()
     elif choice == '4':
         print(bcolors.OKBLUE + "Running categorizing..." + bcolors.ENDC)
-        categorized_4()
+        categorized_bug_4()
+    elif choice == '5':
+        print(bcolors.OKBLUE + "Running categorizing..." + bcolors.ENDC)
+        categorized_type_5()
     else:
         print(bcolors.FAIL + "Invalid choice" + bcolors.ENDC)
 
@@ -74,7 +78,7 @@ def patched_3():
         file_index = math.ceil(patch_index / 10000)
         filewriter.writeJsonFile(f'./data_stages/3_patched/commits_patched_{file_index:04}.jsonl', patched_file)
 
-def categorized_4():
+def categorized_bug_4():
     filewriter = FileWriter()
     filereader = FileReader()
 
@@ -100,6 +104,61 @@ def categorized_4():
                     categorized_messages[category].append(file)
                     filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
     
-    
+def categorized_type_5():
+    filewriter = FileWriter()
+    filereader = FileReader()
+  
+    for file in filereader.readJsonLines('./data_stages/4_categorized'):
+
+        diffs = file['token_changes']['token_diff']
+        category = file['category']
+
+        change = helper_constrain_or_loosen(diffs)
+        if change != None:
+            file['patch_type'] = change
+            filewriter.writeJsonFile(f'./data_stages/5_categorized_patch/commits_{category}.jsonl', file)
+            continue
+        change = helper_nullcheck(diffs)
+        if change != None:
+            file['patch_type'] = change
+            filewriter.writeJsonFile(f'./data_stages/5_categorized_patch/commits_{category}.jsonl', file)
+            continue
+
+
+
+def helper_try_except(diffs: list[str]):
+    if diffs.get("try") > 0 and diffs.get("except") > 0:
+        if diffs.get("OverflowError") > 0:
+            return "try-except OverflowError"
+        return "try-except"
+    return None
+
+def helper_collison(diffs: list[str]):
+    if diffs.get("hash") > 0 or diffs.get("random") > 0:
+        return "collision avoidance"
+    return None
+
+def helper_checkclosure(diffs: list[str]):
+    if diffs.get("if",0) > 0 and diffs.get("done",0) > 0:
+        return "check closure"
+    return None
+
+def helper_nullcheck(diffs: list[str]):
+    if diffs.get("None",0) > 0 and diffs.get("is",0) > 0:
+        return "null check"
+    return None
+
+def helper_constrain_or_loosen(diffs: list[str]):
+    if diffs.get("and",0) > 0:
+        return "Conditional tighten"
+    if diffs.get("and",0) < 0:
+        return "Conditional loosening"
+    if diffs.get("or",0) > 0:
+        return "Conditional loosen"
+    if diffs.get("or",0) < 0:
+        return "Conditional tighten"    
+    return None
+
+
 if __name__ == '__main__':
     main()

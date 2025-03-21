@@ -11,11 +11,19 @@ class Patcher:
         if modified_file is not None:
             added_tokens = self.tokenize_lines(modified_file.get("added_lines", []))
             deleted_tokens = self.tokenize_lines(modified_file.get("deleted_lines", []))
-            
+            token_diff = dict()
+
+            for key in added_tokens.keys() | deleted_tokens.keys():
+                val = added_tokens.get(key,0) - deleted_tokens.get(key,0)
+                if val == 0:
+                    continue
+                token_diff[key] = added_tokens.get(key,0) - deleted_tokens.get(key,0)
+
             patched_file = file.copy()
             patched_file['token_changes'] = {
                 'added_tokens': dict(added_tokens),
-                'deleted_tokens': dict(deleted_tokens)
+                'deleted_tokens': dict(deleted_tokens),
+                'token_diff': token_diff
             }
             
             print(bcolors.OKGREEN + f"Writing added and deleted tokens to file for {file['hashId']}" + bcolors.ENDC)
