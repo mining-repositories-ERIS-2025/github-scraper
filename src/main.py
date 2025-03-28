@@ -1,4 +1,5 @@
 import math
+import os
 from cleaner import Cleaner
 from models.graph import Graph
 from patcher import Patcher
@@ -97,18 +98,22 @@ def categorized_bug_4():
         # get commit message
         commit_message = file.get('msg').lower()
 
-
+        found_keyword = False
         # map to category
         for category, keywords in categories.items():
             for keyword in keywords:
                 if keyword in commit_message:
                     file['category'] = category
                     file['keyword_used'] = keyword
-
+                    
                     plot.add_to_frequency_dict(category)
 
                     categorized_messages[category].append(file)
-                    filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
+                    found_keyword = True
+            if found_keyword != False:
+                filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
+                found_keyword = False
+                break
     
     plot.plot_histogram(title='Bug Category Frequency')
 
@@ -120,7 +125,9 @@ def categorized_type_5():
     for file in filereader.readJsonLines('./data_stages/4_categorized'):
 
         category = file['category']
-
+        if file.get('token_changes').get('token_diff') == None:
+            file['token_changes']['token_diff'] = eval_commit_dif(file['token_changes']['added_tokens'], file['token_changes']['deleted_tokens'])
+            print(f"No token diff found for added {file['token_changes']['added_tokens']} and deleted {file['token_changes']['deleted_tokens']}, calculated {file['token_changes']['token_diff']}")
         change = helper_boolean(file['token_changes'])
         plot.add_to_frequency_dict(change)
 
@@ -136,8 +143,11 @@ def categorized_type_5():
 
 
 def helper_boolean(token_changes: list[str]):
-
-    diffs = token_changes['token_diff']
+    try:
+        diffs = token_changes['token_diff']
+    except:
+        print(token_changes)
+        os.exit(1)
     adds = token_changes['added_tokens']
     dels = token_changes['deleted_tokens']
 
@@ -175,13 +185,13 @@ def helper_boolean(token_changes: list[str]):
         return "thread cancelling"
 
     ## condition logic
-    if diffs.get("and",0) > 0:
+    if diffs.get("and",0) > 0 or diffs.get("&&",0) > 0:
         return "conditional tighten"
-    if diffs.get("and",0) < 0:
+    if diffs.get("and",0) < 0 or diffs.get("&&",0) < 0:
         return "conditional loosen"
-    if diffs.get("or",0) > 0:
+    if diffs.get("or",0) > 0 or diffs.get("||",0) > 0:
         return "conditional loosen"
-    if diffs.get("or",0) < 0:
+    if diffs.get("or",0) < 0 or diffs.get("||",0) < 0:
         return "conditional tighten"  
     if diffs.get("not",0) != 0:
         return "conditional negate"
@@ -231,6 +241,16 @@ def helper_boolean(token_changes: list[str]):
         return "no syntax change"
 
     return None
+
+def eval_commit_dif(added_lines: dict[str, int], deleted_lines: dict[str, int]) -> dict[str, int]:
+    token_diff = dict()
+    for key in added_lines.keys() | deleted_lines.keys():
+        val = added_lines.get(key,0) - deleted_lines.get(key,0)
+        if val == 0:
+            continue
+        token_diff[key] = added_lines.get(key,0) - deleted_lines.get(key,0)
+    return token_diff
+
 
 
 if __name__ == '__main__':

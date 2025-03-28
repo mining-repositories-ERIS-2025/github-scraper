@@ -3,6 +3,8 @@ import json
 
 class FileReader:
     def readJsonLines(self, folder_path: str):
+
+        print(f" the current cwd: ", os.getcwd())
         for filename in os.listdir(folder_path):
             if filename.endswith('.jsonl'):
                 file_path = os.path.join(folder_path, filename)

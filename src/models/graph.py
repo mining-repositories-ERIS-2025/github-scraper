@@ -30,4 +30,4 @@ class Graph:
             height = bar.get_height()
             plt.text(bar.get_x() + bar.get_width() / 2.0, height, f'{int(height)}', ha='center', va='bottom')
 
-        plt.show()
+        plt.savefig(f'./data_stages/{title}.png')
