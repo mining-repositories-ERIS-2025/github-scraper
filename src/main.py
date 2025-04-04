@@ -179,6 +179,9 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
 
     if diffs.get("close",0) > 0 or diffs.get("open",0) > 0:
         return "open/close resource"
+    
+    if diffs.get("detach",0) > 0:
+        return "Free GPU memory"
 
     ## try except
     if diffs.get("try",0) > 0 or diffs.get("except",0) > 0:
