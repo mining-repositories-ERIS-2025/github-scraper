@@ -244,6 +244,14 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     ## regex based fix
     if diffs.get("re",0) != 0 or diffs.get("regex",0) != 0 or diffs.get("match",0) != 0 or "regex" in commit_msg.lower():
         return "regex fix"
+    
+    ## if time.sleep is used to fix race
+    if diffs.get("time",0) != 0 and diffs.get("sleep",0) != 0:
+        return "sleep fix"
+    
+    ## if timeout is used, most likely race condition
+    if diffs.get("timeout",0) != 0:
+        return "timeout fix"
 
     ## if the fix was solved be only deleting code
     if len(adds) == 0 and len(dels) != 0:
