@@ -238,7 +238,7 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
         return "sql fix"
     
     ## numpy based fix
-    if diffs.get("numpy",0) != 0 or diffs.get("np",0) != 0 or diffs.get("ndarray",0) != 0:
+    if diffs.get("numpy",0) != 0 or diffs.get("np",0) != 0 or adds.get("np",0) != 0 or adds.get("numpy",0) != 0:
         return "numpy fix"
 
     ## regex based fix
