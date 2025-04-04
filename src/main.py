@@ -174,15 +174,6 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     if diffs.get("dtype",0) > 0 or diffs.get("astype",0) > 0:
         return "explicit typing"
 
-    if diffs.get("lock", 0) > 0 or diffs.get("mutex",0) > 0:
-        return "thread lock"
-
-    if diffs.get("close",0) > 0 or diffs.get("open",0) > 0:
-        return "open/close resource"
-    
-    if diffs.get("detach",0) > 0:
-        return "Free GPU memory"
-
     ## try except
     if diffs.get("try",0) > 0 or diffs.get("except",0) > 0:
         #if diffs.get("OverflowError",0) > 0:
@@ -238,24 +229,12 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
         return "sql fix"
     
     ## numpy based fix
-    if diffs.get("numpy",0) != 0 or diffs.get("np",0) != 0 or diffs.get("ndarray",0) != 0:
+    if diffs.get("numpy",0) != 0 or diffs.get("np",0) != 0 or adds.get("np",0) != 0 or adds.get("numpy",0) != 0:
         return "numpy fix"
 
     ## regex based fix
     if diffs.get("re",0) != 0 or diffs.get("regex",0) != 0 or diffs.get("match",0) != 0 or "regex" in commit_msg.lower():
         return "regex fix"
-    
-    ## if time.sleep is used to fix race
-    if diffs.get("time",0) != 0 and diffs.get("sleep",0) != 0:
-        return "sleep fix"
-    
-    ## if timeout is used, most likely race condition
-    if diffs.get("timeout",0) != 0:
-        return "timeout fix"
-    
-    ## if yield fix race
-    if diffs.get("yield",0) != 0:
-        return "yield fix"
 
     ## if the fix was solved be only deleting code
     if len(adds) == 0 and len(dels) != 0:
