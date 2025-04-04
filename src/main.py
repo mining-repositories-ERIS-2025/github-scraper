@@ -91,7 +91,13 @@ def categorized_bug_4():
                   'overflows': [' overflow '],
                   'race conditions': [' race ', 'mutex '," deadlock "], 
                   'memory leaks': ['memory leak', 'memory-leak'],
-                  'logical errors': [' edge case ', ' unexpected ',' typo ',' logic ',' if statement']
+                  'logical errors': [' edge case ',' logic '],
+                  'infinite loops': [' infinite loop ', 'infinite-loop'],
+                  'indentation errors': [' indentation ', ' indentation error '],
+                  'import errors': ['import error', 'importerror'],
+                  'division by zero': [' division by zero ', 'divide by zero', 'zero division'],
+                  'network errors': [' network error ', 'network error', 'networkerror'],
+                  'unhandled exceptions': ['exception '],
                   }
 
     categorized_messages = {key: [] for key in categories.keys()}
