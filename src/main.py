@@ -245,6 +245,7 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     if diffs.get("re",0) != 0 or diffs.get("regex",0) != 0 or diffs.get("match",0) != 0 or "regex" in commit_msg.lower():
         return "regex fix"
     
+<<<<<<< HEAD
     ## if time.sleep is used to fix race
     if diffs.get("time",0) != 0 and diffs.get("sleep",0) != 0:
         return "sleep fix"
@@ -256,6 +257,10 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     ## if yield fix race
     if diffs.get("yield",0) != 0:
         return "yield fix"
+=======
+    if diffs.get("float",0) != 0 or diffs.get("uint16",0) != 0 or diffs.get("uint32",0) != 0 or diffs.get("int16",0) != 0 or diffs.get("int32",0) != 0:
+        return "Larger integer"
+>>>>>>> 3f87d07 (added int/uint overflow patches)
 
     ## if the fix was solved be only deleting code
     if len(adds) == 0 and len(dels) != 0:
