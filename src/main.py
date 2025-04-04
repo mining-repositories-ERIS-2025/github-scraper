@@ -174,6 +174,12 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     if diffs.get("dtype",0) > 0 or diffs.get("astype",0) > 0:
         return "explicit typing"
 
+    if diffs.get("lock", 0) > 0 or diffs.get("mutex",0) > 0:
+        return "thread lock"
+
+    if diffs.get("close",0) > 0 or diffs.get("open",0) > 0:
+        return "open/close resource"
+
     ## try except
     if diffs.get("try",0) > 0 or diffs.get("except",0) > 0:
         #if diffs.get("OverflowError",0) > 0:
