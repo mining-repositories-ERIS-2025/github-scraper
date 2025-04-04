@@ -90,7 +90,8 @@ def categorized_bug_4():
                   'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', ' npe'], 
                   'overflows': [' overflow '],
                   'race conditions': [' race ', 'mutex '," deadlock "], 
-                  'memory leaks': ['memory leak', 'memory-leak']
+                  'memory leaks': ['memory leak', 'memory-leak'],
+                  'logical errors': [' edge case ', ' unexpected ',' typo ',' logic ',' if statement']
                   }
 
     categorized_messages = {key: [] for key in categories.keys()}
@@ -150,10 +151,6 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
         os.exit(1)
     adds = token_changes['added_tokens']
     dels = token_changes['deleted_tokens']
-
-    ## if typo in commit msg
-    if "typo" in commit_msg.lower():
-        return "typo fix"
 
     ## boolean change
     if diffs.get("true",0) > 0 and diffs.get("false",0) > 0:
@@ -266,6 +263,10 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     ## if the change was made but was not registered by the parser
     if len(diffs) == 0:
         return "no syntax change"
+
+    ## if typo in commit msg
+    if "typo" in commit_msg.lower():
+        return "typo fix"
 
     return None
 
