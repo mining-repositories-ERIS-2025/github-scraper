@@ -1,7 +1,7 @@
 import math
 import os
 from cleaner import Cleaner
-from models.graph import Graph
+from models.graph import BarGraph, FrequencyMatrix
 from patcher import Patcher
 from combined_scraper import GitScraper
 from models.bcolor import bcolors
@@ -17,6 +17,7 @@ def main():
     print(bcolors.OKCYAN + "3. Run patching" + bcolors.ENDC)
     print(bcolors.OKCYAN + "4. Run catagorizing bug type" + bcolors.ENDC)
     print(bcolors.OKCYAN + "5. Run catagorizing patch type" + bcolors.ENDC)
+    print(bcolors.OKCYAN + "6. Run frequency table" + bcolors.ENDC)
     choice = input(bcolors.OKBLUE + "Enter the number of the function to run: " + bcolors.ENDC)
 
     if choice == '1':
@@ -34,6 +35,9 @@ def main():
     elif choice == '5':
         print(bcolors.OKBLUE + "Running categorizing..." + bcolors.ENDC)
         categorized_type_5()
+    elif choice == '6':
+        print(bcolors.OKBLUE + "Running frequency table..." + bcolors.ENDC)
+        frequency_table_6()
     else:
         print(bcolors.FAIL + "Invalid choice" + bcolors.ENDC)
 
@@ -84,7 +88,6 @@ def categorized_bug_4():
     filewriter = FileWriter()
     filereader = FileReader()
     plot = Graph()
-    frequency_dict = {}
 
     categories = {
                   'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', ' npe'], 
@@ -127,7 +130,7 @@ def categorized_bug_4():
 def categorized_type_5():
     filewriter = FileWriter()
     filereader = FileReader()
-    plot = Graph()
+    plot = BarGraph()
   
     for file in filereader.readJsonLines('./data_stages/4_categorized'):
 
@@ -147,6 +150,14 @@ def categorized_type_5():
             filewriter.writeJsonFile(f'./data_stages/5_categorized_patch/commits_unknown.jsonl', file)
             continue
     plot.plot_histogram(title='Patch Type Frequency')
+
+def frequency_table_6():
+    filereader = FileReader()
+    plot = FrequencyMatrix()
+
+    for file in filereader.readJsonLines('./data_stages/5_categorized_patch'):
+        plot.add_to_frequency_dict(file.get('patch_type'), file.get('category'))
+    plot.plot_matrix()
 
 
 def helper_boolean(token_changes: list[str], commit_msg: str):
