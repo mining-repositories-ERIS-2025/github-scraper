@@ -252,6 +252,10 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     ## if timeout is used, most likely race condition
     if diffs.get("timeout",0) != 0:
         return "timeout fix"
+    
+    ## if yield fix race
+    if diffs.get("yield",0) != 0:
+        return "yield fix"
 
     ## if the fix was solved be only deleting code
     if len(adds) == 0 and len(dels) != 0:
