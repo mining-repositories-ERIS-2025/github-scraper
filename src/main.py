@@ -128,7 +128,7 @@ def categorized_type_5():
         if file.get('token_changes').get('token_diff') == None:
             file['token_changes']['token_diff'] = eval_commit_dif(file['token_changes']['added_tokens'], file['token_changes']['deleted_tokens'])
             print(f"No token diff found for added {file['token_changes']['added_tokens']} and deleted {file['token_changes']['deleted_tokens']}, calculated {file['token_changes']['token_diff']}")
-        change = helper_boolean(file['token_changes'])
+        change = helper_boolean(file['token_changes'], file['msg'])
         plot.add_to_frequency_dict(change)
 
         if change != None:
@@ -142,7 +142,7 @@ def categorized_type_5():
     plot.plot_histogram(title='Patch Type Frequency')
 
 
-def helper_boolean(token_changes: list[str]):
+def helper_boolean(token_changes: list[str], commit_msg: str):
     try:
         diffs = token_changes['token_diff']
     except:
@@ -150,6 +150,10 @@ def helper_boolean(token_changes: list[str]):
         os.exit(1)
     adds = token_changes['added_tokens']
     dels = token_changes['deleted_tokens']
+
+    ## if typo in commit msg
+    if "typo" in commit_msg.lower():
+        return "typo fix"
 
     ## boolean change
     if diffs.get("true",0) > 0 and diffs.get("false",0) > 0:
@@ -229,7 +233,7 @@ def helper_boolean(token_changes: list[str]):
         return "numpy fix"
 
     ## regex based fix
-    if diffs.get("re",0) != 0 or diffs.get("regex",0) != 0 or diffs.get("match",0) != 0:
+    if diffs.get("re",0) != 0 or diffs.get("regex",0) != 0 or diffs.get("match",0) != 0 or "regex" in commit_msg.lower():
         return "regex fix"
 
     ## if the fix was solved be only deleting code
