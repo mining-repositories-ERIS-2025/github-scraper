@@ -46,7 +46,7 @@ class FrequencyMatrix:
         else:
             self.frequency_dict[key1] = {key2: 1}
 
-    def plot_matrix(self, data_dict: dict = None, title='Frequency Matrix'):
+    def plot_matrix(self, data_dict: dict = None, title='Frequency Matrix', normalize=False):
         if data_dict is None:
             data_dict = self.frequency_dict
 
@@ -69,10 +69,16 @@ class FrequencyMatrix:
                 if key2 in data_dict[key1]:
                     matrix[i, j] = data_dict[key1][key2]
 
+        # Normalize the matrix across the Y-axis if the normalize flag is active
+        if normalize:
+            row_sums = matrix.sum(axis=0, keepdims=True)
+            row_sums[row_sums == 0] = 1  # Avoid division by zero
+            matrix = matrix / row_sums
+
         # Plot the matrix
-        plt.figure(figsize=(7, 10))
+        plt.figure(figsize=(9, 12.5))
         plt.imshow(matrix, cmap='viridis', interpolation='nearest')
-        plt.colorbar(label='Frequency')
+        plt.colorbar(label='Frequency' if not normalize else 'Normalized Frequency')
         plt.xticks(range(len(sorted_key2)), sorted_key2, rotation=90)
         plt.yticks(range(len(sorted_key1)), sorted_key1)
         plt.xlabel('Bug Type')
@@ -80,9 +86,13 @@ class FrequencyMatrix:
         plt.title(title)
         plt.tight_layout()
 
-        # Annotate the matrix with frequency values
+        # Annotate the matrix with frequency values (2 decimal precision if normalized)
         for i in range(len(sorted_key1)):
             for j in range(len(sorted_key2)):
-                plt.text(j, i, int(matrix[i, j]), ha='center', va='center', color='white')
+                value = matrix[i, j]
+                if normalize:
+                    plt.text(j, i, f'{value:.2f}', ha='center', va='center', color='white', fontsize=8)
+                else:
+                    plt.text(j, i, int(value), ha='center', va='center', color='white', fontsize=8)
 
         plt.savefig(f'./data_stages/{title}.png')
