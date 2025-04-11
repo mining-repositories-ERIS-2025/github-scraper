@@ -209,7 +209,7 @@ def categorized_type_5():
     filereader = FileReader()
     plot = BarGraph()
   
-    filewriter.cleanFolder(f'./data_stages/5_categorized_path/')
+    filewriter.cleanFolder(f'./data_stages/5_categorized_patch/')
     for file in filereader.readJsonLines('./data_stages/4_categorized'):
 
         category = file['category']
