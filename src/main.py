@@ -61,6 +61,7 @@ def cleaned_2():
     filereader = FileReader()
 
     clean_index = 0
+    filewriter.cleanFolder(f'./data_stages/2_cleaned/')
     for file in filereader.readJsonLines('./data_stages/1_raw'):
         cleaned_file = Cleaner().clean_file(file)
         if cleaned_file == {}:
@@ -75,6 +76,7 @@ def patched_3():
     filereader = FileReader()
 
     patch_index = 0
+    filewriter.cleanFolder(f'./data_stages/3_patched/')
     for file in filereader.readJsonLines('./data_stages/2_cleaned'):
         patched_file = Patcher().patch_file(file)
         if patched_file == {}:
@@ -90,20 +92,73 @@ def categorized_bug_4():
     plot = BarGraph()
 
     categories = {
-                  'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', ' npe'], 
-                  'overflows': [' overflow '],
-                  'race conditions': [' race ', 'mutex '," deadlock "], 
-                  'memory leaks': ['memory leak', 'memory-leak'],
-                  'logical errors': [' edge case ',' logic '],
-                  'infinite loops': [' infinite loop ', 'infinite-loop'],
-                  'indentation errors': [' indentation ', ' indentation error '],
-                  'import errors': ['import error', 'importerror'],
-                  'division by zero': [' division by zero ', 'divide by zero', 'zero division'],
-                  'network errors': [' network error ', 'network error', 'networkerror'],
-                  'unhandled exceptions': ['exception '],
-                  }
+                'null pointer exceptions': [
+                    ' null ', 
+                    'null-pointer', 
+                    'null pointer', 
+                    'nullpointer',
+                    'seg', 
+                    ' npe'
+                ], 
+                'overflows': [
+                    ' overflow'
+                ],
+                'race conditions': [
+                    ' race ',
+                    'mutex ',
+                    ' deadlock '
+                ], 
+                'memory leaks': [
+                    'memory leak', 
+                    'memory-leak'
+                ],
+                'logical errors': [
+                    ['indentation ', ' error '],
+                    ' edge case ',
+                    ' logic ',
+                    ' fix error ',
+                    ' infinite loop ',
+                    'infinite-loop'
+                ],
+                'import errors': [
+                    [' import',' error '],
+                    'importerror'
+                ],
+                'division by zero': [
+                    ' division by zero ', 
+                    'divide by zero', 
+                    'zero division'
+                ],
+                'network errors': [
+                    ['error', ' network '],
+                    ['error', ' socket '],
+                    'network error', 
+                    'networkerror',
+                ],
+                'prevented exception error': [
+                    ['exception', ' prevent'],
+                    ['exception', ' fix'],
+                ],
+                'unhandled exception error': [
+                    ['exception', ' add'],
+                    ['exception', ' raise'],
+                    ['exception', ' include'],
+                    ['exception', ' another'],
+                    ['exception', ' raise'],
+                    ['exception', ' replace'],
+                    ['exception', ' correct'],
+                    ['exception', ' cause'],
+                    ['exception', ' use'],
+                    ['exception', ' catch'],
+                    ['exception', ' make'],
+                    ['exception', ' handle'],
+                    ['exception', ' broaden'],
+                ],
+    }
 
     categorized_messages = {key: [] for key in categories.keys()}
+    
+    filewriter.cleanFolder(f'./data_stages/4_categorized/')
     for file in filereader.readJsonLines('./data_stages/3_patched'):
         # get commit message
         commit_message = file.get('msg').lower()
@@ -111,15 +166,37 @@ def categorized_bug_4():
         found_keyword = False
         # map to category
         for category, keywords in categories.items():
-            for keyword in keywords:
-                if keyword in commit_message:
-                    file['category'] = category
-                    file['keyword_used'] = keyword
-                    
-                    plot.add_to_frequency_dict(category)
+            for outer_keyword in keywords:
 
-                    categorized_messages[category].append(file)
-                    found_keyword = True
+                ## is nested array
+                if isinstance(outer_keyword, list):
+                    found_inner = True
+                    for inner_keyword in outer_keyword:
+                        if inner_keyword not in commit_message:
+                            found_inner = False
+                            break
+                    if found_inner == True:
+                        file['category'] = category
+                        file['keyword_used'] = outer_keyword
+                        
+                        plot.add_to_frequency_dict(category)
+
+                        categorized_messages[category].append(file)
+                        found_keyword = True
+                        break
+                        
+                ## Is not nested array
+                else:
+                    if outer_keyword in commit_message:
+                        file['category'] = category
+                        file['keyword_used'] = outer_keyword
+                        
+                        plot.add_to_frequency_dict(category)
+
+                        categorized_messages[category].append(file)
+                        found_keyword = True
+                        break
+            
             if found_keyword != False:
                 filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
                 found_keyword = False
@@ -132,6 +209,7 @@ def categorized_type_5():
     filereader = FileReader()
     plot = BarGraph()
   
+    filewriter.cleanFolder(f'./data_stages/5_categorized_path/')
     for file in filereader.readJsonLines('./data_stages/4_categorized'):
 
         category = file['category']
@@ -199,9 +277,13 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
 
     ## try except
     if diffs.get("try",0) > 0 or diffs.get("except",0) > 0:
-        #if diffs.get("OverflowError",0) > 0:
-            #return "try-except OverflowError"
         return "try-except"
+
+    for key in diffs.keys():
+        if "Error" in key and diffs.get(key,0) > 0:
+            return "change exception type"
+        if "Exception" in key and diffs.get(key,0) > 0:
+            return "Broaden exception type"
 
     ## scoping change
     if diffs.get("import",0) > 0:
