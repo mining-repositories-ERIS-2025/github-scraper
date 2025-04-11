@@ -87,7 +87,7 @@ def patched_3():
 def categorized_bug_4():
     filewriter = FileWriter()
     filereader = FileReader()
-    plot = Graph()
+    plot = BarGraph()
 
     categories = {
                   'null pointer exceptions': [' null ', "null-pointer", "null pointer", "nullpointer" 'seg', ' npe'], 
