@@ -159,12 +159,14 @@ def categorized_bug_4():
     filewriter.cleanFolder(f'./data_stages/4_categorized/')
     for file in filereader.readJsonLines('./data_stages/3_patched'):
         # get commit message
-        commit_message = file.get('msg').lower()
+        commit_message: str = file.get('msg').lower()
 
         found_keyword = False
         # map to category
         for category, keywords in categories.items():
             for outer_keyword in keywords:
+                inner_index = 0
+                outer_index = 0
 
                 ## is nested array
                 if isinstance(outer_keyword, list):
@@ -173,6 +175,12 @@ def categorized_bug_4():
                         if inner_keyword not in commit_message:
                             found_inner = False
                             break
+                        if inner_keyword in commit_message:
+                            print(f"Found keyword {inner_keyword} in commit message: {commit_message.split()}")
+                            for idx, word in enumerate(commit_message.split()):
+                                if word in inner_keyword:
+                                    inner_index = idx
+                                    break
                     if found_inner == True:
                         file['category'] = category
                         file['keyword_used'] = outer_keyword
@@ -192,9 +200,21 @@ def categorized_bug_4():
                         plot.add_to_frequency_dict(category)
 
                         categorized_messages[category].append(file)
+                        print(f"Found keyword {outer_keyword} in commit message: {commit_message}")
+                        for idx, word in enumerate(commit_message.split()):
+                            if word in outer_keyword:
+                                outer_index = idx
+                                break
                         found_keyword = True
                         break
             
+            index_diff = abs(inner_index - outer_index)
+
+            has_inner = inner_index != 0 and outer_index != 0
+
+            if has_inner or index_diff > 3:
+                found_keyword = False
+
             if found_keyword != False:
                 filewriter.writeJsonFile(f'./data_stages/4_categorized/commits_{category}.jsonl', file)
                 found_keyword = False
