@@ -177,4 +177,7 @@ pyrightconfig.json
 
 *.jsonl
 
+*.png
+./**/*.png
+
 .vscode/
