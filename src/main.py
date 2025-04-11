@@ -285,10 +285,6 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
         if "Exception" in key and diffs.get(key,0) > 0:
             return "Broaden exception type"
 
-    ## scoping change
-    if diffs.get("import",0) > 0:
-        return "libary change"
-
     ## thread cancelling
     if diffs.get("cancel",0) > 0:
         return "thread cancelling"
@@ -345,10 +341,22 @@ def helper_boolean(token_changes: list[str], commit_msg: str):
     if diffs.get("time",0) != 0 and diffs.get("sleep",0) != 0:
         return "sleep fix"
     
+        ## if time.sleep is used to fix race
+    if diffs.get("str",0) != 0:
+        return "string related fix"
+    
     ## if timeout is used, most likely race condition
     if diffs.get("timeout",0) != 0:
         return "timeout fix"
     
+    if adds.get("import",0) > 0 or dels.get("import",0) > 0:
+        return "import change"
+    if diffs.get("as",0) > 0 and diffs.get("with",0) > 0:
+        return "import change"
+
+    if diffs.get("int",0) > 0:
+        return "int related fix" 
+
     ## if yield fix race
     if diffs.get("yield",0) != 0:
         return "yield fix"
