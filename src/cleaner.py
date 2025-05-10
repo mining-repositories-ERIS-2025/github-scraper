@@ -14,7 +14,7 @@ class Cleaner:
                 return cleaned_file
 
             for key, value in file.items():
-                if key in ['repository', 'hashId', 'msg']:
+                if key in ['repository', 'hashId', 'msg', 'repository_stars']:
                     cleaned_file[key] = value
 
             cleaned_file['modified_file'] = {
