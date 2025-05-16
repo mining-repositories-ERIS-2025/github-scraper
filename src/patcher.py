@@ -6,13 +6,22 @@ import re
 import ast
 
 class Patcher:
+    def __init__(self):
+        self.err_count = 0
+        self.total_count = 0
+        self.current_file_is_error = False
+        
     def patch_file(self, file: dict) -> dict:
         patched_file = {}
         modified_file = file.get('modified_file')
         
         if modified_file is not None:
+            self.total_count +=1
             added_tokens = self.tokenize_lines(modified_file.get("added_lines", []))
             deleted_tokens = self.tokenize_lines(modified_file.get("deleted_lines", []))
+            if self.current_file_is_error:
+                self.err_count += 1
+                self.current_file_is_error = False
             token_diff = dict()
 
             for key in added_tokens.keys() | deleted_tokens.keys():
@@ -66,7 +75,8 @@ class Patcher:
                 if token.type == tokenize.NAME:
                     tokens.append(token.string)
 
-        except (tokenize.TokenError, SyntaxError, LookupError, UnicodeError) as e: 
+        except (tokenize.TokenError, SyntaxError, LookupError, UnicodeError) as e:
+            self.current_file_is_error = True
             print(bcolors.FAIL + f"Failed to tokenize line: {code}" + bcolors.ENDC)
             print(bcolors.FAIL + str(e) + bcolors.ENDC)
 

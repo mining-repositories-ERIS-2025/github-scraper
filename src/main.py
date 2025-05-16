@@ -46,14 +46,20 @@ def cleaned_2():
 
     clean_index = 0
     filewriter.cleanFolder(f'./data_stages/2_cleaned/')
+    total_count = 0
+    total_err = 0
     for file in filereader.readJsonLines('./data_stages/1_raw'):
-        cleaned_file = Cleaner().clean_file(file)
+        cleaner = Cleaner()
+        cleaned_file = cleaner.clean_file(file)
+        total_count += cleaner.total_count
+        total_err += cleaner.err_count
         if cleaned_file == {}:
             continue
 
         clean_index += 1
         file_index = math.ceil(clean_index / 10000)
         filewriter.writeJsonFile(f'./data_stages/2_cleaned/commits_cleaned_{file_index:04}.jsonl', cleaned_file)
+    print(bcolors.OKGREEN + f"Total tokens: {total_count} -- total errs {total_err}  -- ratio = {total_err/total_count}" + bcolors.ENDC)
 
 def patched_3():
     filewriter = FileWriter()
@@ -61,15 +67,24 @@ def patched_3():
 
     patch_index = 0
     filewriter.cleanFolder(f'./data_stages/3_patched/')
-    for file in filereader.readJsonLines('./data_stages/2_cleaned'):
-        patched_file = Patcher().patch_file(file)
-        if patched_file == {}:
-            continue
+    total_count = 0
+    total_err = 0
+    try:
+        for file in filereader.readJsonLines('./data_stages/2_cleaned'):
+            patcher = Patcher()
+            patched_file = patcher.patch_file(file)
+            total_count += patcher.total_count
+            total_err += patcher.err_count
+            if patched_file == {}:
+                continue
 
-        patch_index += 1
-        file_index = math.ceil(patch_index / 10000)
-        filewriter.writeJsonFile(f'./data_stages/3_patched/commits_patched_{file_index:04}.jsonl', patched_file)
-
+            patch_index += 1
+            file_index = math.ceil(patch_index / 10000)
+            filewriter.writeJsonFile(f'./data_stages/3_patched/commits_patched_{file_index:04}.jsonl', patched_file)
+    except Exception as e:
+        print(bcolors.OKGREEN + f"Total tokens: {total_count} -- total errs {total_err}  -- ratio = {total_err/total_count}" + bcolors.ENDC)
+    
+    
 def categorized_bug_4():
     filewriter = FileWriter()
     filereader = FileReader()

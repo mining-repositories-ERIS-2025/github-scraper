@@ -30,5 +30,5 @@ class Selector:
                     func()
                 else:
                     print(bcolors.FAIL + "Invalid choice. Please enter a valid number." + bcolors.ENDC)
-        except ValueError:
-            print(bcolors.FAIL + "Invalid input. Please enter a number or a valid range (e.g., 1 or 4-6)." + bcolors.ENDC)
+        except ValueError as e:
+            print(bcolors.FAIL + f"Invalid input. Please enter a number or a valid range (e.g., 1 or 4-6). -- err {e}" + bcolors.ENDC)
