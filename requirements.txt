@@ -6,3 +6,5 @@ tqdm==4.67.1
 utils==1.0.2
 matplotlib==3.10.1
 plotly
+ydata-profiling
+sweetviz
