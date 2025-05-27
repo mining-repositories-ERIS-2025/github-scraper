@@ -4,8 +4,8 @@ data = {
     "stage 1": 1318263,
     "stage 2": 197408,
     "stage 3": 197408,
-    "stage 4": 517,
-    "stage 5": 306,
+    "stage 4": 2468,
+    "stage 5": 1069,
 }
 
 # Extract stages (x-axis) and values (y-axis) from the dictionary

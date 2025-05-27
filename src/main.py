@@ -1,4 +1,5 @@
 import math
+import random
 from cleaner import Cleaner
 from models.graph import BarGraph, FrequencyMatrix
 from patcher import Patcher
@@ -20,6 +21,7 @@ def main():
         ("Categorizing bug type", categorized_bug_4),
         ("Categorizing patch type", categorized_type_5),
         ("Frequency table", frequency_table_6),
+        ("Validation", validation_7),
     ]
 
     selector = Selector(options)
@@ -251,10 +253,28 @@ def frequency_table_6():
     plot = FrequencyMatrix()
 
     for file in filereader.readJsonLines('./data_stages/5_categorized_patch'):
+        if file.get('patch_type') == "unknown":
+            continue
         plot.add_to_frequency_dict(file.get('patch_type'), file.get('category'))
     plot.plot_matrix(title="Frequency Matrix Norm",normalize=True)
     plot.plot_matrix(title="Frequency Matrix")
 
+def validation_7():
+    filewriter = FileWriter()
+    filereader = FileReader()
+
+    all_commits = []
+
+    for file in filereader.readJsonLines('./data_stages/5_categorized_patch'):
+        if file.get('patch_type') == "unknown":
+            continue
+        all_commits.append(file)
+    
+    sampled_commits = random.sample(all_commits, 50) if len(all_commits) >= 50 else all_commits
+
+    filewriter.cleanFolder(f'./data_stages/7_validation/')
+    for file in sampled_commits:
+        filewriter.writeJsonFile(f'./data_stages/7_validation/samples.jsonl', file)
 
 if __name__ == '__main__':
     main()
