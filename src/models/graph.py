@@ -75,6 +75,19 @@ class FrequencyMatrix:
             row_sums[row_sums == 0] = 1  # Avoid division by zero
             matrix = matrix / row_sums
 
+        # floor 0.09 to 0 if normalize is True
+        if normalize:
+            matrix[matrix < 0.09] = 0
+            # renormalize matrix after flooring
+            row_sums = matrix.sum(axis=0, keepdims=True)
+            row_sums[row_sums == 0] = 1
+            matrix = matrix / row_sums
+        
+        # remove rows with all zeros
+        non_zero_rows = np.any(matrix, axis=1)
+        matrix = matrix[non_zero_rows]
+        sorted_key1 = [sorted_key1[i] for i in range(len(sorted_key1)) if non_zero_rows[i]]
+
         # Plot the matrix
         plt.figure(figsize=(9, 12.5))
         plt.imshow(matrix, cmap='coolwarm', interpolation='nearest')
