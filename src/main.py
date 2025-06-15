@@ -255,6 +255,8 @@ def frequency_table_6():
     for file in filereader.readJsonLines('./data_stages/5_categorized_patch'):
         if file.get('patch_type') == "unknown":
             continue
+        if file.get('patch_type') == "no syntax change":
+            continue
         plot.add_to_frequency_dict(file.get('patch_type'), file.get('category'))
     plot.plot_matrix(title="Frequency Matrix Norm",normalize=True)
     plot.plot_matrix(title="Frequency Matrix")

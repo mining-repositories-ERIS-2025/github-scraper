@@ -77,7 +77,7 @@ class FrequencyMatrix:
 
         # Plot the matrix
         plt.figure(figsize=(9, 12.5))
-        plt.imshow(matrix, cmap='viridis', interpolation='nearest')
+        plt.imshow(matrix, cmap='coolwarm', interpolation='nearest')
         plt.colorbar(label='Frequency' if not normalize else 'Normalized Frequency')
         plt.xticks(range(len(sorted_key2)), sorted_key2, rotation=90)
         plt.yticks(range(len(sorted_key1)), sorted_key1)
