@@ -258,6 +258,12 @@ def frequency_table_6():
         if file.get('patch_type') == "no syntax change":
             continue
         plot.add_to_frequency_dict(file.get('patch_type'), file.get('category'))
+
+    # setting <0.09 to 0
+    for key1, sub_dict in plot.frequency_dict.items():
+        for key2, value in sub_dict.items():
+            if value < 0.09:
+                plot.frequency_dict[key1][key2] = 0
     plot.plot_matrix(title="Frequency Matrix Norm",normalize=True)
     plot.plot_matrix(title="Frequency Matrix")
 
